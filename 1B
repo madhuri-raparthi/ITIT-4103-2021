@@ -1,0 +1,48 @@
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn import datasets
+from sklearn.metrics import classification_report
+from tqdm import tqdm
+from time import time
+from scipy.stats import multivariate_normal as mvn
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+
+from keras.datasets import mnist
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_train=x_train.reshape(60000,784)
+x_test=x_test.reshape(10000,784)
+
+def NaiveBayes(X_train, y_train, X_test,smoothing):
+  curve_data = dict()
+  probab_prior= dict()
+  training_label = set(y_train)
+  #testing_label = set(y_test)
+  for c in training_label:
+    current_X = X_train[y_train==c]
+    curve_data[c] = {
+        'mean':current_X.mean(axis=0)+smoothing/2,
+        'cov' :current_X.var(axis=0)+smoothing
+    }
+  
+    probab_prior[c] = float(len([y_train==c]))/len(y_train)
+    N, D = X_test.shape
+    Probabilties = np.zeros((N, len(curve_data))) 
+   
+    for c, g in curve_data.items():
+      mean, cov = g['mean'], g['cov']
+      Probabilties[:,c] = mvn.logpdf(X_test, mean=mean, cov=cov) + np.log(probab_prior[c])
+    y_hat = np.argmax(Probabilties, axis=1)
+
+  return y_hat
+  
+  y_pred=NaiveBayes(x_train, y_train, x_test,10)
+  
+matrix = confusion_matrix(y_test,y_pred)
+print(matrix)
+
+from sklearn.metrics import classification_report
+print('\nClassification Report\n')
+print(classification_report(y_test, y_pred))
