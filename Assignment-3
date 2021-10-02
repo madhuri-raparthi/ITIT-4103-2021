@@ -1,1 +1,24 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
+input = np.random.uniform(0, 1, 50)            
+noise = np.random.normal(0, 0.032, 50)
+withnoise = np.sin(1 + np.power(x, 2)) + noise 
+nonoise = np.sin(1 + np.power(x, 2)) 
+input_train, input_test, withnoise_train, withnoise_test = train_test_split(input, withnoise,test_size=0.2)
+input_train, input_test, nonoise_train, nonoise_test = train_test_split(input, nonoise,test_size=0.2)
+plt.xlabel("x-axis")
+plt.ylabel("y-axis")
+plt.title('Training Data')
+plt.scatter(input_train, withnoise_train, label = "Noisy")
+plt.scatter(input_train, nonoise_train, label = "Noise-free")
+plt.show()
+plt.xlabel("x-axis")
+plt.ylabel("y-axis")
+plt.title('Test Data')
+plt.scatter(input_test, withnoise_test, label = "Noisy")
+plt.scatter(input_test, nonoise_test, label = "Noise-free")
+plt.legend()
+plt.show()
